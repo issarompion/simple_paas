@@ -71,7 +71,6 @@ function createJob(url){
         var result = JSON.parse(str);
         if(result){
           submit(url,'started')
-          ready(id)
         }
     });
     })
@@ -145,40 +144,4 @@ function submit(url,state){
   producer.on('error', function (err) {
     console.log('error', err);
   })
-}
-
-function ready(id){
-  console.log('ready',id)
-  const options = {
-    hostname: '148.60.11.202',
-    port: 4646,
-    path: '/v1/job/'+id+'/allocations',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  }
-  
-  const req = http.request(options, (res) => {
-    console.log(`statusCode: ${res.statusCode}`)
-    var str = '';
-    res.setEncoding('utf8');
-    res.on('data', (d) => {
-      str += d
-    })
-    res.on('end', function() {
-      var result = JSON.parse(str);
-      if(result){
-        //TODO send ready producer
-        console.log(result)
-      }
-  });
-  })
-  
-  req.on('error', (error) => {
-    console.error(error)
-  })
-  
-  req.write(JSON.stringify(data))
-  req.end()
 }
