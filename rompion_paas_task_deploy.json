@@ -1,0 +1,155 @@
+{
+"Job": {
+    "Stop": false,
+    "Region": "global",
+    "Namespace": "default",
+    "ID": "issajobPaaS",
+    "ParentID": "",
+    "Name": "issajobPaaS",
+    "Type": "service",
+    "Priority": 50,
+    "AllAtOnce": false,
+    "Datacenters": [
+      "dc1"
+    ],
+    "Constraints": null,
+    "Affinities": null,
+    "Spreads": null,
+    "TaskGroups": [
+      {
+        "Name": "issagrp",
+        "Count": 1,
+        "Update": {
+          "Stagger": 30000000000,
+          "MaxParallel": 1,
+          "HealthCheck": "checks",
+          "MinHealthyTime": 10000000000,
+          "HealthyDeadline": 300000000000,
+          "ProgressDeadline": 600000000000,
+          "AutoRevert": false,
+          "AutoPromote": false,
+          "Canary": 0
+        },
+        "Migrate": {
+          "MaxParallel": 1,
+          "HealthCheck": "checks",
+          "MinHealthyTime": 10000000000,
+          "HealthyDeadline": 300000000000
+        },
+        "Constraints": null,
+        "RestartPolicy": {
+          "Attempts": 2,
+          "Interval": 1800000000000,
+          "Delay": 15000000000,
+          "Mode": "fail"
+        },
+        "Tasks": [
+          {
+            "Name": "serverissa",
+            "Driver": "docker",
+            "User": "",
+            "Config": {
+              "port_map": [
+                {
+                  "http": 1337
+                }
+              ],
+              "args": [
+                "https://github.com/issarompion/basic_node",
+                "app"
+              ],
+              "image": "irompion/deployissa:firsttry"
+            },
+            "Env": null,
+            "Services": null,
+            "Vault": null,
+            "Templates": null,
+            "Constraints": null,
+            "Affinities": null,
+            "Resources": {
+              "CPU": 100,
+              "MemoryMB": 256,
+              "DiskMB": 0,
+              "IOPS": 0,
+              "Networks": [
+                {
+                  "Mode": "",
+                  "Device": "",
+                  "CIDR": "",
+                  "IP": "",
+                  "MBits": 10,
+                  "ReservedPorts": null,
+                  "DynamicPorts": [
+                    {
+                      "Label": "http",
+                      "Value": 0,
+                      "To": 0
+                    }
+                  ]
+                }
+              ],
+              "Devices": null
+            },
+            "DispatchPayload": null,
+            "Meta": null,
+            "KillTimeout": 5000000000,
+            "LogConfig": {
+              "MaxFiles": 10,
+              "MaxFileSizeMB": 10
+            },
+            "Artifacts": null,
+            "Leader": false,
+            "ShutdownDelay": 0,
+            "VolumeMounts": null,
+            "KillSignal": "",
+            "Kind": ""
+          }
+        ],
+        "EphemeralDisk": {
+          "Sticky": false,
+          "SizeMB": 300,
+          "Migrate": false
+        },
+        "Meta": null,
+        "ReschedulePolicy": {
+          "Attempts": 0,
+          "Interval": 0,
+          "Delay": 30000000000,
+          "DelayFunction": "exponential",
+          "MaxDelay": 3600000000000,
+          "Unlimited": true
+        },
+        "Affinities": null,
+        "Spreads": null,
+        "Networks": null,
+        "Services": null,
+        "Volumes": null
+      }
+    ],
+    "Update": {
+      "Stagger": 30000000000,
+      "MaxParallel": 1,
+      "HealthCheck": "",
+      "MinHealthyTime": 0,
+      "HealthyDeadline": 0,
+      "ProgressDeadline": 0,
+      "AutoRevert": false,
+      "AutoPromote": false,
+      "Canary": 0
+    },
+    "Periodic": null,
+    "ParameterizedJob": null,
+    "Dispatched": false,
+    "Payload": null,
+    "Meta": null,
+    "VaultToken": "",
+    "Status": "running",
+    "StatusDescription": "",
+    "Stable": true,
+    "Version": 2,
+    "SubmitTime": 1574960313954164200,
+    "CreateIndex": 59886,
+    "ModifyIndex": 59901,
+    "JobModifyIndex": 59888
+  }
+}
