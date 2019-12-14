@@ -1,19 +1,18 @@
 'use strict';
 
+const variables = require('./variables')
 const bodyParser = require('body-parser');
 const express = require('express');
-var app = express();
+const app = express();
 const kafka = require('kafka-node')
 
-var list = {}
+let list = {}
 
 app.use(bodyParser.urlencoded({ extended: false }));
-//app.use(express.static(path.join(__dirname)))
 app.set('views', './views');
 app.set('view engine', 'ejs');
 
 app.get('/', function (req, res) {
-    //res.sendFile(__dirname + '/index.html');
     res.render('index', { title: 'Simple App', list: list })
 });
 
@@ -24,30 +23,25 @@ app.post('/submit-url', function (req, res) {
     res.redirect('/')
 });
 
-
 function submit(url,action){
-  console.log('submit')
+  console.log('submit',url,action)
   const Producer = kafka.Producer;
-  const client = new kafka.KafkaClient({kafkaHost: '148.60.11.178:9092'});
-  const producer = new Producer(client, { requireAcks: 1 })
-  var topic = 'byzance'
+  const producer = new Producer(new kafka.KafkaClient({kafkaHost: variables.kafkaHost}), { requireAcks: 1 })
   producer.on('ready', function () {
-    console.log('ready')
       let payloads = [
           {
-            topic: topic,
+            topic: variables.topic,
             messages: JSON.stringify({
               action : action,
-              repository : url,
-              domain : 'issa.esir.deuxfleurs.fr'
+              repository : url
             })
           }
         ];
         producer.send(payloads, (err, data) => {
           if (err) {
-            console.log('[kafka-producer -> '+topic+']: broker update failed');
+            console.log('[kafka-producer -> '+variables.topic+']: broker update failed');
           } else {
-            console.log('[kafka-producer -> '+topic+']: broker update success');
+            console.log('[kafka-producer -> '+variables.topic+']: broker update success');
           }
         });
   });
@@ -63,34 +57,34 @@ app.listen(1995, function () {
 
 
 const Consumer = kafka.Consumer
-const client = new kafka.KafkaClient({kafkaHost: '148.60.11.178:9092'});
-
 const consumer = new Consumer(
-    client,
+  new kafka.KafkaClient({kafkaHost: variables.kafkaHost}),
     [
-        { topic: 'byzance', partitions: 1 }
+        { topic: variables.topic, partitions: 1 }
     ],
     {
         autoCommit: false
     }
 );
 
-consumer.on('message', function (message) {
-  if(message.value){
-    let msg = JSON.parse(message.value)
-    console.log('parse',msg)
-    if(msg.state && msg.repository){
-      let state = msg.state
-      let url = msg.repository
-      console.log('msg',state,url)
-      updateList(url,state)
-    }
-  }
-});
+variables.getOffset.then(lastoffset=>{
 
-consumer.on('error', function (err) {
-    console.log('error', err);
+  consumer.on('message', function (message) {
+    if(message.offset >= lastoffset && message.value){
+      let msg = JSON.parse(message.value)
+      if(msg.state && msg.repository){
+        let state = msg.state
+        let url = msg.repository
+        updateList(url,state)
+      }
+    }
   });
+  
+  consumer.on('error', function (err) {
+      console.log('error', err);
+  });
+
+})
 
 function updateList(url,state){
   if(url && state){
